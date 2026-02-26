@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+  <!-- ================= TOPBAR ================= -->
+  <header class="topbar topbar-layout">
+
+    <!-- Coluna vazia (equilíbrio visual) -->
+    <div class="topbar-left"></div>
+
+    <!-- Logo central -->
+    <div class="brand brand-center">
+      <img
+        class="brand-logo brand-logo-big"
+        src="./assets/makersLogo.svg"
+        alt="Makers Lab"
+      />
+    </div>
+
+    <!-- Botão + status -->
+    <div class="topbar-right">
+      <button
+        id="btnRefreshGlobal"
+        type="button"
+        class="btn-refresh btn-refresh-small"
+      >
+        Atualizar
+      </button>
+
+      <div id="globalLastUpdate" class="brand-sub right-sub">
+        Última atualização: —
+      </div>
+    </div>
+
+  </header>
+  <!-- =============== /TOPBAR ================= -->
+
+
+  <!-- ================= DASHBOARD ================= -->
+  <div class="dashboard">
+
+    <!-- ===== BLOCO SUPERIOR: 4 CARDS ===== -->
+    <section class="dashboard-top">
+
+      <!-- ===== CARD 1: RANKING CAPTAÇÃO ===== -->
+      <div class="ranking-card">
+        <div class="ranking-title">🏆 Ranking Captação</div>
+
+        <div id="ranking_captacao"></div>
+
+        <div class="status" id="status_captacao">Carregando dados…</div>
+        <div class="erro" id="erro_captacao">Erro ao carregar ranking.</div>
+      </div>
+
+
+      <!-- ===== CARD 2: KPI CAPTAÇÃO (2 ARCOS) ===== -->
+      <div class="kpi-card">
+        <div class="kpi-title">📈 Captações</div>
+
+        <div class="kpi-gauge-wrap">
+          <canvas id="gauge-captacao"></canvas>
+
+          <div class="kpi-center">
+            <div class="kpi-stack">
+              <div id="kpiMonth-captacao" class="kpi-value kpi-value-month">0</div>
+              <div class="kpi-sub">
+                Mês / Meta mensal:
+                <span id="kpiMonthGoal-captacao">0</span>
+              </div>
+
+              <div class="kpi-mini">
+                <span id="kpiToday-captacao">0</span>
+                <span class="kpi-mini-sep">/</span>
+                <span id="kpiDailyGoal-captacao">0</span>
+              </div>
+              <div class="kpi-sub">Hoje / Meta diária</div>
+            </div>
+          </div>
+        </div>
+
+        <ul class="kpi-list">
+          <li>
+            <span class="dot dot-today"></span>
+            Hoje
+            <span id="vHoje-captacao" class="kpi-right">0</span>
+          </li>
+          <li>
+            <span class="dot dot-yest"></span>
+            Ontem
+            <span id="vOntem-captacao" class="kpi-right">0</span>
+          </li>
+          <li>
+            <span class="dot dot-week"></span>
+            Semana passada
+            <span id="vSemana-captacao" class="kpi-right">0</span>
+          </li>
+        </ul>
+
+        <div class="status" id="kpiStatus-captacao">Carregando KPI…</div>
+        <div class="erro" id="kpiErro-captacao">Erro ao carregar KPI.</div>
+      </div>
+
+
+      <!-- ===== CARD 3: RANKING ONBOARDING ===== -->
+      <div class="ranking-card">
+        <div class="ranking-title">🏅 Ranking Onboarding</div>
+
+        <div id="ranking_onboarding"></div>
+
+        <div class="status" id="status_onboarding">Carregando dados…</div>
+        <div class="erro" id="erro_onboarding">Erro ao carregar ranking.</div>
+      </div>
+
+      <!-- ===== CARD 4: KPI FINANCEIRO (top) ===== -->
+      <div class="kpi-card">
+        <div class="kpi-title">💰 Financeiro</div>
+
+        <div class="kpi-gauge-wrap">
+          <canvas id="gauge-financeiro"></canvas>
+
+          <div class="kpi-center">
+            <div class="kpi-stack">
+              <div id="kpiMonth-financeiro" class="kpi-value kpi-value-month">$0</div>
+              <div class="kpi-sub">
+                Mês / Meta mensal:
+                <span id="kpiMonthGoal-financeiro">$0</span>
+              </div>
+
+              <div class="kpi-mini">
+                <span id="kpiToday-financeiro">$0</span>
+                <span class="kpi-mini-sep">/</span>
+                <span id="kpiDailyGoal-financeiro">$0</span>
+              </div>
+              <div class="kpi-sub">Hoje / Meta diária</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ mantém legendas: Hoje / Ontem / Semana passada -->
+        <ul class="kpi-list">
+          <li>
+            <span class="dot dot-today"></span>
+            Hoje
+            <span id="vHoje-financeiro" class="kpi-right">$0</span>
+          </li>
+          <li>
+            <span class="dot dot-yest"></span>
+            Ontem
+            <span id="vOntem-financeiro" class="kpi-right">$0</span>
+          </li>
+          <li>
+            <span class="dot dot-week"></span>
+            Semana passada
+            <span id="vSemana-financeiro" class="kpi-right">$0</span>
+          </li>
+        </ul>
+
+        <div class="status" id="kpiStatus-financeiro">Carregando KPI…</div>
+        <div class="erro" id="kpiErro-financeiro">Erro ao carregar KPI.</div>
+      </div>
+
+    </section>
+    <!-- ===== /BLOCO SUPERIOR ===== -->
+
+
+    <!-- ===== BLOCO INFERIOR (BOTTOM) ===== -->
+    <section class="dashboard-bottom">
+
+      <div class="bottom-grid-4">
+
+        <!-- ✅ Coluna 1: Ranking (span 2 linhas) -->
+        <div class="bottom-ranking ranking-card">
+          <div class="ranking-title">🛒 Ranking Captação TikTok Shop</div>
+
+          <div id="ranking_tiktokshop"></div>
+
+          <div class="status" id="status_tiktokshop">Carregando dados…</div>
+          <div class="erro" id="erro_tiktokshop">Erro ao carregar ranking.</div>
+        </div>
+
+        <!-- ✅ Coluna 2: (mini-cards + KPI) -->
+        <div class="bottom-col bottom-col-capt">
+
+          <!-- topo: mini-cards -->
+          <div class="bottom-mini-capt">
+            <div class="stat-row">
+
+              <div class="stat-card">
+                <div class="stat-head">
+                  <div class="stat-left">
+                    <div class="stat-icon">
+                      <img class="stat-icon-img" src="./assets/eye.svg" alt="">
+                    </div>
+                    <div class="stat-title">Criadores Ativos</div>
+                  </div>
+                </div>
+
+                <!-- ✅ IDs corretos (JS usa statAtivos*) -->
+                <div id="statAtivosValue" class="stat-value">0</div>
+                <div class="status" id="statAtivosStatus">Carregando…</div>
+                <div class="erro" id="statAtivosErro">Erro ao carregar.</div>
+              </div>
+
+              <div class="stat-card">
+                <div class="stat-head">
+                  <div class="stat-left">
+                    <div class="stat-icon">
+                      <img class="stat-icon-img" src="./assets/captados.svg" alt="">
+                    </div>
+                    <div class="stat-title">Criadores Captados</div>
+                  </div>
+                </div>
+
+                <div id="statCaptadosValue" class="stat-value">0</div>
+                <div class="status" id="statCaptadosStatus">Carregando…</div>
+                <div class="erro" id="statCaptadosErro">Erro ao carregar.</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- base: KPI Captação TikTok Shop -->
+          <div class="bottom-kpi-capt kpi-card">
+            <div class="kpi-title">📈 Captações TikTok Shop</div>
+
+            <div class="kpi-gauge-wrap">
+              <canvas id="gauge-tiktokshop"></canvas>
+
+              <div class="kpi-center">
+                <div class="kpi-stack">
+                  <div id="kpiMonth-tiktokshop" class="kpi-value kpi-value-month">0</div>
+                  <div class="kpi-sub">
+                    Mês / Meta mensal:
+                    <span id="kpiMonthGoal-tiktokshop">0</span>
+                  </div>
+
+                  <div class="kpi-mini">
+                    <span id="kpiToday-tiktokshop">0</span>
+                    <span class="kpi-mini-sep">/</span>
+                    <span id="kpiDailyGoal-tiktokshop">0</span>
+                  </div>
+                  <div class="kpi-sub">Hoje / Meta diária</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="status" id="kpiStatus-tiktokshop">Carregando KPI…</div>
+            <div class="erro" id="kpiErro-tiktokshop">Erro ao carregar KPI.</div>
+          </div>
+
+        </div>
+
+        <!-- ✅ Coluna 3: (mini-cards + KPI) -->
+        <div class="bottom-col bottom-col-onb">
+
+          <!-- topo: mini-cards do onboarding -->
+          <div class="bottom-mini-onb">
+            <div class="stat-row">
+
+              <!-- Card META -->
+              <div class="stat-card">
+                <div class="stat-head">
+                  <div class="stat-left">
+                    <div class="stat-icon">
+                      <img class="stat-icon-img" src="./assets/meta.svg" alt="">
+                    </div>
+                    <div class="stat-title">Meta</div>
+                  </div>
+                </div>
+
+                <div class="stat-value">R$100.000</div>
+              </div>
+
+              <!-- Card VALOR (placeholder) -->
+              <div class="stat-card">
+                <div class="stat-head">
+                  <div class="stat-left">
+                    <div class="stat-icon">
+                      <img class="stat-icon-img" src="./assets/total.svg" alt="">
+                    </div>
+                    <div class="stat-title">Valor</div>
+                  </div>
+                </div>
+
+                <div class="stat-value">—</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- base: KPI Onboarding TikTok Shop -->
+          <div class="bottom-kpi-onb kpi-card">
+            <div class="kpi-title">🧩 Onboarding TikTok Shop</div>
+
+            <div class="kpi-gauge-wrap">
+              <canvas id="gauge-tiktokshop-onboarding"></canvas>
+
+              <div class="kpi-center">
+                <div class="kpi-stack">
+                  <div id="kpiMonth-tiktokshop-onboarding" class="kpi-value kpi-value-month">0</div>
+                  <div class="kpi-sub">
+                    Mês / Meta mensal:
+                    <span id="kpiMonthGoal-tiktokshop-onboarding">0</span>
+                  </div>
+
+                  <div class="kpi-mini">
+                    <span id="kpiToday-tiktokshop-onboarding">0</span>
+                    <span class="kpi-mini-sep">/</span>
+                    <span id="kpiDailyGoal-tiktokshop-onboarding">0</span>
+                  </div>
+                  <div class="kpi-sub">Hoje / Meta diária</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="status" id="kpiStatus-tiktokshop-onboarding">Carregando KPI…</div>
+            <div class="erro" id="kpiErro-tiktokshop-onboarding">Erro ao carregar KPI.</div>
+          </div>
+
+        </div>
+
+        <!-- ✅ Coluna 4: espaço reservado -->
+        <div class="bottom-right-spacer"></div>
+
+      </div>
+    </section>
+    <!-- ===== /BLOCO INFERIOR ===== -->
+
+  </div>
+
+  <!-- JS -->
+  <script src="./script.js"></script>
+</body>
+</html>
